@@ -5,10 +5,7 @@ type TSidebarProps = ComponentProps<'aside'>
 
 export const Sidebar = ({ className, children, ...props }: TSidebarProps) => {
   return (
-    <aside
-      className={twMerge('w-[250px] mt-10 h-[100vh + 10px] overflow-auto', className)}
-      {...props}
-    >
+    <aside className={twMerge('w-[250px] h-[100vh + 10px] overflow-auto', className)} {...props}>
       {children}
     </aside>
   )

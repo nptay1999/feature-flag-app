@@ -5,7 +5,11 @@ type TContentProps = ComponentProps<'div'>
 
 export const Content = forwardRef<HTMLDivElement, TContentProps>(
   ({ children, className, ...props }, ref) => (
-    <div ref={ref} className={twMerge('flex-1 overflow-auto', className)} {...props}>
+    <div
+      ref={ref}
+      className={twMerge('flex-1 bg-card text-card-foreground overflow-auto', className)}
+      {...props}
+    >
       {children}
     </div>
   )
