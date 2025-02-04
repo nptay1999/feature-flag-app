@@ -14,21 +14,31 @@ export const CreateFeatureFlagModal = ({ open, onClose }: TCreateFeatureFlagModa
   const handleCancel = async () => {
     const filePath = form.getFieldValue('filePath')
     if (filePath) await window.context.deleteFile(filePath)
-    form.resetFields()
-    setError(undefined)
-    onClose()
+    handleClose()
   }
 
   const handleBrowseFile = async () => {
-    const filePath = await window.context.createFeatureFlag()
+    const projectName = form.getFieldValue('projectName')
+    if (!projectName) return setError('Project Name is required')
+
+    setError(undefined)
+    const filePath = await window.context.createFeatureFlag(projectName)
 
     if (!filePath) return
     form.setFieldValue('filePath', filePath)
   }
 
-  const handleFinished: FormProps['onFinish'] = (values) => {
-    console.log(values)
+  const handleFinished: FormProps['onFinish'] = async (values) => {
+    const { filePath } = values
+    const featureFlag = await window.context.loadFeatureFlagFile(filePath)
+    console.log({ featureFlag })
+    handleClose()
+  }
+
+  const handleClose = () => {
+    form.resetFields()
     setError(undefined)
+    onClose()
   }
 
   const handleError: FormProps['onFinishFailed'] = (error) => {

@@ -1,9 +1,14 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import { CreateFeatureFlag, DeleteFile } from '@shared/types'
+import {
+  CreateFeatureFlag,
+  DeleteFile,
+  GetFeatureFlagFilePath,
+  LoadFeatureFlagFile
+} from '@shared/types'
 import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
-import { createFeatureFlag, deleteFile } from './libs'
+import { createFeatureFlag, deleteFile, getFeatureFlagFilePath, loadFeatureFlagFile } from './libs'
 
 function createWindow(): void {
   // Create the browser window.
@@ -66,6 +71,12 @@ app.whenReady().then(() => {
     createFeatureFlag(...args)
   )
   ipcMain.handle('deleteFile', (_, ...args: Parameters<DeleteFile>) => deleteFile(...args))
+  ipcMain.handle('getFeatureFlagFilePath', (_, ...args: Parameters<GetFeatureFlagFilePath>) =>
+    getFeatureFlagFilePath(...args)
+  )
+  ipcMain.handle('loadFeatureFlagFile', (_, ...args: Parameters<LoadFeatureFlagFile>) =>
+    loadFeatureFlagFile(...args)
+  )
 
   createWindow()
 

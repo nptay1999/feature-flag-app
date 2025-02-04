@@ -1,15 +1,22 @@
-import { CreateFeatureFlag, DeleteFile } from '@shared/types'
+import { FeatureFlagSchema } from '@shared/schemas'
+import {
+  CreateFeatureFlag,
+  DeleteFile,
+  GetFeatureFlagFilePath,
+  LoadFeatureFlagFile,
+  TFeatureFlag
+} from '@shared/types'
 import dayjs from 'dayjs'
 import { dialog } from 'electron'
-import { ensureDir, remove, writeJSON } from 'fs-extra'
+import { ensureDir, ensureFile, readJSON, remove, writeJSON } from 'fs-extra'
 import { homedir } from 'os'
 
 export const getRootDir = () => {
   return `${homedir()}/Documents`
 }
 
-export const createNewFeatureFlagFileContent = () => {
-  const content = {
+export const createNewFeatureFlagFileContent = (projectName: string) => {
+  const content: TFeatureFlag = {
     features: [
       {
         key: 'DASHBOARD',
@@ -32,12 +39,13 @@ export const createNewFeatureFlagFileContent = () => {
     ],
     createdAt: dayjs().toISOString(),
     updatedAt: dayjs().toISOString(),
-    updater: 'taynguyen@fullertonhealth.com'
+    updater: 'taynguyen@fullertonhealth.com',
+    projectName
   }
   return content
 }
 
-export const createFeatureFlag: CreateFeatureFlag = async () => {
+export const createFeatureFlag: CreateFeatureFlag = async (projectName: string) => {
   const rootDir = getRootDir()
 
   await ensureDir(rootDir)
@@ -56,10 +64,11 @@ export const createFeatureFlag: CreateFeatureFlag = async () => {
     return ''
   }
 
-  const newContent = createNewFeatureFlagFileContent()
+  const newContent = createNewFeatureFlagFileContent(projectName)
 
   await writeJSON(filePath, newContent, {
-    spaces: 2
+    spaces: 2,
+    encoding: 'utf-8'
   })
 
   return filePath
@@ -72,4 +81,36 @@ export const deleteFile: DeleteFile = async (path) => {
     console.error(error)
   }
   return
+}
+
+export const getFeatureFlagFilePath: GetFeatureFlagFilePath = async () => {
+  const rootDir = getRootDir()
+
+  await ensureDir(rootDir)
+
+  const { filePaths, canceled } = await dialog.showOpenDialog({
+    title: 'Select Feature Flag',
+    defaultPath: rootDir,
+    buttonLabel: 'Select',
+    filters: [{ name: 'JSON', extensions: ['json'] }],
+    properties: ['openFile']
+  })
+
+  if (canceled) {
+    return ''
+  }
+
+  return filePaths[0]
+}
+
+export const loadFeatureFlagFile: LoadFeatureFlagFile = async (path: string) => {
+  await ensureFile(path)
+
+  const data = await readJSON(path, {
+    encoding: 'utf-8'
+  })
+
+  const featureFlag = await FeatureFlagSchema.parseAsync(data)
+
+  return featureFlag
 }

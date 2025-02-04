@@ -1,4 +1,9 @@
-import { CreateFeatureFlag, DeleteFile } from '@shared/types'
+import {
+  CreateFeatureFlag,
+  DeleteFile,
+  GetFeatureFlagFilePath,
+  LoadFeatureFlagFile
+} from '@shared/types'
 import { contextBridge, ipcRenderer } from 'electron'
 
 if (!process.contextIsolated) {
@@ -10,7 +15,11 @@ try {
     locale: navigator.language,
     createFeatureFlag: (...args: Parameters<CreateFeatureFlag>) =>
       ipcRenderer.invoke('createFeatureFlag', ...args),
-    deleteFile: (...args: Parameters<DeleteFile>) => ipcRenderer.invoke('deleteFile', ...args)
+    deleteFile: (...args: Parameters<DeleteFile>) => ipcRenderer.invoke('deleteFile', ...args),
+    getFeatureFlagFilePath: (...args: Parameters<GetFeatureFlagFilePath>) =>
+      ipcRenderer.invoke('getFeatureFlagFilePath', ...args),
+    loadFeatureFlagFile: (...args: Parameters<LoadFeatureFlagFile>) =>
+      ipcRenderer.invoke('loadFeatureFlagFile', ...args)
   })
 } catch (error) {
   console.error(error)
