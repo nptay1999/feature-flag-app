@@ -9,4 +9,4 @@ export type CreateFeatureFlag = (projectName: string) => Promise<string>
 export type DeleteFile = (path: string) => Promise<void>
 export type GetFeatureFlagFilePath = () => Promise<string>
 export type LoadFeatureFlagFile = (path: string) => Promise<TFeatureFlag>
-export type SaveFeatureFlag = (featureFlag: TFeatureFlag) => Promise<boolean>
+export type SaveFeatureFlag = (filePath: string, featureFlag: TFeatureFlag) => Promise<boolean>

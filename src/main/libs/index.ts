@@ -4,6 +4,7 @@ import {
   DeleteFile,
   GetFeatureFlagFilePath,
   LoadFeatureFlagFile,
+  SaveFeatureFlag,
   TFeatureFlag
 } from '@shared/types'
 import dayjs from 'dayjs'
@@ -113,4 +114,21 @@ export const loadFeatureFlagFile: LoadFeatureFlagFile = async (path: string) => 
   const featureFlag = await FeatureFlagSchema.parseAsync(data)
 
   return featureFlag
+}
+
+export const saveFeatureFlag: SaveFeatureFlag = async (
+  filePath: string,
+  featureFlag: TFeatureFlag
+) => {
+  try {
+    await ensureFile(filePath)
+    await writeJSON(filePath, featureFlag, {
+      spaces: 2,
+      encoding: 'utf-8'
+    })
+    return true
+  } catch (error) {
+    console.error(error)
+    return false
+  }
 }

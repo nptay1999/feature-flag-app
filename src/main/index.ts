@@ -3,12 +3,19 @@ import {
   CreateFeatureFlag,
   DeleteFile,
   GetFeatureFlagFilePath,
-  LoadFeatureFlagFile
+  LoadFeatureFlagFile,
+  SaveFeatureFlag
 } from '@shared/types'
 import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
-import { createFeatureFlag, deleteFile, getFeatureFlagFilePath, loadFeatureFlagFile } from './libs'
+import {
+  createFeatureFlag,
+  deleteFile,
+  getFeatureFlagFilePath,
+  loadFeatureFlagFile,
+  saveFeatureFlag
+} from './libs'
 
 function createWindow(): void {
   // Create the browser window.
@@ -76,6 +83,9 @@ app.whenReady().then(() => {
   )
   ipcMain.handle('loadFeatureFlagFile', (_, ...args: Parameters<LoadFeatureFlagFile>) =>
     loadFeatureFlagFile(...args)
+  )
+  ipcMain.handle('saveFeatureFlag', (_, ...args: Parameters<SaveFeatureFlag>) =>
+    saveFeatureFlag(...args)
   )
 
   createWindow()

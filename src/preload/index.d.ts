@@ -2,7 +2,8 @@ import {
   CreateFeatureFlag,
   DeleteFile,
   GetFeatureFlagFilePath,
-  LoadFeatureFlagFile
+  LoadFeatureFlagFile,
+  SaveFeatureFlag
 } from '@shared/types'
 
 declare global {
@@ -12,6 +13,7 @@ declare global {
       deleteFile: DeleteFile
       getFeatureFlagFilePath: GetFeatureFlagFilePath
       loadFeatureFlagFile: LoadFeatureFlagFile
+      saveFeatureFlag: SaveFeatureFlag
     }
   }
 }

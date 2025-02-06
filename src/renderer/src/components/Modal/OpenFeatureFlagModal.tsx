@@ -1,7 +1,10 @@
 import { Modal, TModalProps } from '@renderer/components'
 import { Button, Input, Label } from '@renderer/libs'
+import { useFeatureFlagStore } from '@renderer/store'
+import { ESideTab } from '@renderer/utils'
 import Form, { Field, FormProps, useForm } from 'rc-field-form'
 import { useState } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 
 type TOpenFeatureFlagModalProps = Pick<TModalProps, 'open'> & {
   onClose: VoidFunction
@@ -10,6 +13,14 @@ type TOpenFeatureFlagModalProps = Pick<TModalProps, 'open'> & {
 export const OpenFeatureFlagModal = ({ open, onClose }: TOpenFeatureFlagModalProps) => {
   const [form] = useForm()
   const [error, setError] = useState<string>()
+
+  const [setFeatureFlag, setActiveSideTab, setFeatureFlagFilePath] = useFeatureFlagStore(
+    useShallow((state) => [
+      state.setFeatureFlag,
+      state.setActiveSideTab,
+      state.setFeatureFlagFilePath
+    ])
+  )
 
   const handleBrowseFile = async () => {
     const filePath = await window.context.getFeatureFlagFilePath()
@@ -21,7 +32,9 @@ export const OpenFeatureFlagModal = ({ open, onClose }: TOpenFeatureFlagModalPro
   const handleFinished: FormProps['onFinish'] = async (values) => {
     const { filePath } = values
     const featureFlag = await window.context.loadFeatureFlagFile(filePath)
-    console.log({ featureFlag })
+    setFeatureFlag(featureFlag)
+    setActiveSideTab(ESideTab.FEATURE)
+    setFeatureFlagFilePath(filePath)
     handleClose()
   }
 

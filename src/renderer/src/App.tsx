@@ -1,40 +1,45 @@
 import {
   Content,
   DraggableTopBar,
+  MainContents,
   MainLayout,
+  ProjectHeader,
   Sidebar,
   SidebarList,
   SideControl
 } from '@/components'
-import { RiFlagLine, RiUserSettingsLine } from 'react-icons/ri'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { Toaster } from './libs'
+
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false
+    },
+    mutations: {}
+  }
+})
 
 function App(): JSX.Element {
-  const items = [
-    {
-      title: 'Feature Flags',
-      icon: <RiFlagLine />,
-      key: 'Feature Flags'
-    },
-    {
-      title: 'Roles',
-      icon: <RiUserSettingsLine />,
-      key: 'Roles'
-    }
-  ]
   return (
     <>
-      <DraggableTopBar />
-      <MainLayout>
-        <div>
-          <SideControl />
-          <Sidebar className="p-2">
-            <SidebarList items={items} />
-          </Sidebar>
-        </div>
-        <Content className="border-l border-l-white/20">
-          <header className="flex h-12 shrink-0 items-center gap-2 border-b px-4"></header>
-        </Content>
-      </MainLayout>
+      <Toaster />
+      <QueryClientProvider client={queryClient}>
+        <DraggableTopBar />
+        <MainLayout>
+          <div>
+            <SideControl />
+            <Sidebar className="p-2">
+              <SidebarList />
+            </Sidebar>
+          </div>
+          <Content className="border-l border-l-white/20">
+            <ProjectHeader />
+            <MainContents />
+          </Content>
+        </MainLayout>
+      </QueryClientProvider>
     </>
   )
 }

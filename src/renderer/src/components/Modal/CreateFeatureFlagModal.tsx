@@ -1,7 +1,10 @@
 import { Modal, TModalProps } from '@renderer/components'
 import { Button, Input, Label } from '@renderer/libs'
+import { useFeatureFlagStore } from '@renderer/store'
+import { ESideTab } from '@renderer/utils'
 import Form, { Field, FormProps, useForm } from 'rc-field-form'
 import { useState } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 
 type TCreateFeatureFlagModalProps = Pick<TModalProps, 'open'> & {
   onClose: VoidFunction
@@ -10,6 +13,14 @@ type TCreateFeatureFlagModalProps = Pick<TModalProps, 'open'> & {
 export const CreateFeatureFlagModal = ({ open, onClose }: TCreateFeatureFlagModalProps) => {
   const [form] = useForm()
   const [error, setError] = useState<string>()
+
+  const [setFeatureFlag, setActiveSideTab, setFeatureFlagFilePath] = useFeatureFlagStore(
+    useShallow((state) => [
+      state.setFeatureFlag,
+      state.setActiveSideTab,
+      state.setFeatureFlagFilePath
+    ])
+  )
 
   const handleCancel = async () => {
     const filePath = form.getFieldValue('filePath')
@@ -31,7 +42,9 @@ export const CreateFeatureFlagModal = ({ open, onClose }: TCreateFeatureFlagModa
   const handleFinished: FormProps['onFinish'] = async (values) => {
     const { filePath } = values
     const featureFlag = await window.context.loadFeatureFlagFile(filePath)
-    console.log({ featureFlag })
+    setFeatureFlagFilePath(filePath)
+    setActiveSideTab(ESideTab.FEATURE)
+    setFeatureFlag(featureFlag)
     handleClose()
   }
 

@@ -2,7 +2,8 @@ import {
   CreateFeatureFlag,
   DeleteFile,
   GetFeatureFlagFilePath,
-  LoadFeatureFlagFile
+  LoadFeatureFlagFile,
+  SaveFeatureFlag
 } from '@shared/types'
 import { contextBridge, ipcRenderer } from 'electron'
 
@@ -19,7 +20,9 @@ try {
     getFeatureFlagFilePath: (...args: Parameters<GetFeatureFlagFilePath>) =>
       ipcRenderer.invoke('getFeatureFlagFilePath', ...args),
     loadFeatureFlagFile: (...args: Parameters<LoadFeatureFlagFile>) =>
-      ipcRenderer.invoke('loadFeatureFlagFile', ...args)
+      ipcRenderer.invoke('loadFeatureFlagFile', ...args),
+    saveFeatureFlag: (...args: Parameters<SaveFeatureFlag>) =>
+      ipcRenderer.invoke('saveFeatureFlag', ...args)
   })
 } catch (error) {
   console.error(error)
