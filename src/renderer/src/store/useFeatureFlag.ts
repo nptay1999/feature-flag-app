@@ -22,6 +22,7 @@ type TFeatureFlagStore = {
   setActiveSideTab: (activeSideTab?: ESideTab) => void
 
   toggleFeature: (featureKey: string) => void
+  deleteRole: (role: string) => void
 
   resetStore: VoidFunction
 }
@@ -54,6 +55,22 @@ export const useFeatureFlagStore = create<TFeatureFlagStore>()((set, get) => ({
     if (!isMutate) return
 
     return set({ featureFlag: { ...featureFlag, features: newFeatures } })
+  },
+
+  deleteRole: (role: string) => {
+    const featureFlag = get().featureFlag
+    if (!featureFlag) return
+
+    const newRoles = featureFlag.roles.filter((r) => r.role !== role)
+
+    const newFeatures = featureFlag.features.map((f) => {
+      return {
+        ...f,
+        roles: f.roles.filter((r) => r !== role)
+      }
+    })
+
+    return set({ featureFlag: { ...featureFlag, features: newFeatures, roles: newRoles } })
   },
 
   resetStore: () => set({ ...initValues })

@@ -4,17 +4,6 @@ import dayjs from 'dayjs'
 import { capitalize } from 'lodash'
 import { RiCircleLine } from 'react-icons/ri'
 
-// {
-//   "key": "DASHBOARD",
-//   "name": "Dashboard",
-//   "tags": "module,page",
-//   "createdAt": "2025-02-04T18:24:36.960Z",
-//   "updatedAt": "2025-02-04T18:24:36.962Z",
-//   "updater": "taynguyen@fullertonhealth.com",
-//   "active": false,
-//   "roles": ["admin"]
-// }
-
 type TGetFeatureColumns = {
   toggleActive: (key: string) => void
 }
