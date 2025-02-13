@@ -39,3 +39,11 @@ export const FeatureFlagSchema = z.object({
   updater: z.string().email(),
   projectName: z.string().max(255)
 })
+
+export const CacheSchema = z.array(
+  z.object({
+    path: z.string(),
+    name: z.string(),
+    active: z.boolean()
+  })
+)

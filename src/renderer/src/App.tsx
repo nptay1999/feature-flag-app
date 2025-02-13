@@ -1,4 +1,5 @@
 import {
+  CacheLoader,
   Content,
   DraggableTopBar,
   MainContents,
@@ -27,18 +28,20 @@ function App(): JSX.Element {
       <Toaster />
       <QueryClientProvider client={queryClient}>
         <DraggableTopBar />
-        <MainLayout>
-          <div>
-            <SideControl />
-            <Sidebar className="p-2">
-              <SidebarList />
-            </Sidebar>
-          </div>
-          <Content className="border-l border-l-white/20">
-            <ProjectHeader />
-            <MainContents />
-          </Content>
-        </MainLayout>
+        <CacheLoader>
+          <MainLayout>
+            <div>
+              <SideControl />
+              <Sidebar className="p-2">
+                <SidebarList />
+              </Sidebar>
+            </div>
+            <Content className="border-l border-l-white/20">
+              <ProjectHeader />
+              <MainContents />
+            </Content>
+          </MainLayout>
+        </CacheLoader>
       </QueryClientProvider>
     </>
   )

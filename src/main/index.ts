@@ -3,8 +3,10 @@ import {
   CreateFeatureFlag,
   DeleteFile,
   GetFeatureFlagFilePath,
+  LoadCache,
   LoadFeatureFlagFile,
-  SaveFeatureFlag
+  SaveFeatureFlag,
+  WriteCache
 } from '@shared/types'
 import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { join } from 'path'
@@ -13,8 +15,10 @@ import {
   createFeatureFlag,
   deleteFile,
   getFeatureFlagFilePath,
+  loadCache,
   loadFeatureFlagFile,
-  saveFeatureFlag
+  saveFeatureFlag,
+  writeCache
 } from './libs'
 
 function createWindow(): void {
@@ -87,6 +91,8 @@ app.whenReady().then(() => {
   ipcMain.handle('saveFeatureFlag', (_, ...args: Parameters<SaveFeatureFlag>) =>
     saveFeatureFlag(...args)
   )
+  ipcMain.handle('loadCache', (_, ...args: Parameters<LoadCache>) => loadCache(...args))
+  ipcMain.handle('writeCache', (_, ...args: Parameters<WriteCache>) => writeCache(...args))
 
   createWindow()
 

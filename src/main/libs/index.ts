@@ -1,16 +1,29 @@
-import { FeatureFlagSchema } from '@shared/schemas'
+import { CacheSchema, FeatureFlagSchema } from '@shared/schemas'
 import {
   CreateFeatureFlag,
   DeleteFile,
   GetFeatureFlagFilePath,
   LoadFeatureFlagFile,
   SaveFeatureFlag,
-  TFeatureFlag
+  TCache,
+  TFeatureFlag,
+  WriteCache
 } from '@shared/types'
 import dayjs from 'dayjs'
 import { dialog } from 'electron'
-import { ensureDir, ensureFile, readJSON, remove, writeJSON } from 'fs-extra'
+import {
+  ensureDir,
+  ensureFile,
+  pathExists,
+  readJson,
+  readJSON,
+  remove,
+  writeJson,
+  writeJSON
+} from 'fs-extra'
 import { homedir } from 'os'
+import path from 'path'
+import { LoadCache } from './../../shared/types.d'
 
 export const getRootDir = () => {
   return `${homedir()}/Documents`
@@ -107,11 +120,40 @@ export const getFeatureFlagFilePath: GetFeatureFlagFilePath = async () => {
 export const loadFeatureFlagFile: LoadFeatureFlagFile = async (path: string) => {
   await ensureFile(path)
 
+  // Read and validate feature flag file
   const data = await readJSON(path, {
     encoding: 'utf-8'
   })
-
   const featureFlag = await FeatureFlagSchema.parseAsync(data)
+
+  const cache = await loadCache()
+
+  // Check if the file already exists in cache
+  const existingEntry = cache.find((item) => item.path === path)
+
+  // If it exists and is already active, return immediately (no cache update needed)
+  if (existingEntry?.active) return featureFlag
+
+  // Otherwise, update the cache:
+  // - If the file exists, update its active status
+  // - Otherwise, add a new entry and deactivate others
+  let updatedCache: TCache
+  if (existingEntry) {
+    // Update the existing entry's active status
+    updatedCache = cache.map((item) => ({
+      ...item,
+      active: item.path === path // Only activate the matched entry
+    }))
+  } else {
+    // Add new entry and deactivate others
+    updatedCache = [
+      { path, name: featureFlag.projectName, active: true },
+      ...cache.map((item) => ({ ...item, active: false }))
+    ]
+  }
+
+  // Save only if an update is needed
+  await writeCache(updatedCache)
 
   return featureFlag
 }
@@ -129,6 +171,52 @@ export const saveFeatureFlag: SaveFeatureFlag = async (
     return true
   } catch (error) {
     console.error(error)
+    return false
+  }
+}
+
+export const loadCache: LoadCache = async () => {
+  // Get home directory and construct the cache file path
+  const cacheDir = path.join(homedir(), '.cache', 'feature-flag')
+  const cacheFile = path.join(cacheDir, 'cache.json')
+
+  try {
+    // Ensure the cache directory exists
+    await ensureDir(cacheDir)
+
+    // Check if cache file exists, if not create with empty array
+    if (!(await pathExists(cacheFile))) {
+      await writeJson(cacheFile, [])
+    }
+
+    // Load JSON data
+    const rawData = await readJson(cacheFile)
+
+    // Validate data with Zod
+    return CacheSchema.parse(rawData)
+  } catch (error) {
+    console.error('Failed to load cache:', error)
+    return []
+  }
+}
+
+export const writeCache: WriteCache = async (cache) => {
+  const cacheDir = path.join(homedir(), '.cache', 'feature-flag')
+  const cacheFile = path.join(cacheDir, 'cache.json')
+
+  try {
+    // Ensure the cache directory exists
+    await ensureDir(cacheDir)
+
+    // Validate cache data before writing
+    const validatedCache = CacheSchema.parse(cache)
+
+    // Write to JSON file
+    await writeJson(cacheFile, validatedCache, { spaces: 2 })
+
+    return true
+  } catch (error) {
+    console.error('Failed to write cache:', error)
     return false
   }
 }
