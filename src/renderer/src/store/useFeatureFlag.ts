@@ -58,19 +58,25 @@ export const useFeatureFlagStore = create<TFeatureFlagStore>()((set, get) => ({
   },
 
   deleteRole: (role: string) => {
-    const featureFlag = get().featureFlag
-    if (!featureFlag) return
+    console.log({ role })
+    set((state) => {
+      const featureFlag = state.featureFlag
+      console.log('Before deletion:', featureFlag) // Debugging
 
-    const newRoles = featureFlag.roles.filter((r) => r.role !== role)
+      if (!featureFlag) return {}
 
-    const newFeatures = featureFlag.features.map((f) => {
-      return {
+      const newRoles = featureFlag.roles.filter((r) => r.role !== role)
+
+      const newFeatures = featureFlag.features.map((f) => ({
         ...f,
-        roles: f.roles.filter((r) => r !== role)
-      }
-    })
+        roles: f.roles.filter((r) => r !== role) // Ensure correct filtering
+      }))
 
-    return set({ featureFlag: { ...featureFlag, features: newFeatures, roles: newRoles } })
+      const updatedFeatureFlag = { ...featureFlag, features: newFeatures, roles: newRoles }
+      console.log('After deletion:', updatedFeatureFlag) // Debugging
+
+      return { featureFlag: updatedFeatureFlag }
+    })
   },
 
   resetStore: () => set({ ...initValues })

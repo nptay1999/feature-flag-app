@@ -1,6 +1,7 @@
 import { useSaveRoles } from '@renderer/hooks'
 import { Button, Input, Table, useToast } from '@renderer/libs'
 import { useFeatureFlagStore } from '@renderer/store'
+import Form, { Field } from 'rc-field-form'
 import { useMemo } from 'react'
 import { RiAddLine, RiLoader4Line, RiSave3Fill } from 'react-icons/ri'
 import { useShallow } from 'zustand/react/shallow'
@@ -41,7 +42,11 @@ const Roles = () => {
       </div>
 
       <div className="mb-4 flex items-center gap-4">
-        <Input placeholder="Search role name..." />
+        <Form className="w-full">
+          <Field name="search">
+            <Input placeholder="Search role name..." />
+          </Field>
+        </Form>
         <Button variant="outline" onClick={handleSaveRoles}>
           {isSaveFeaturesLoading ? <RiLoader4Line className="animate-spin" /> : <RiSave3Fill />}{' '}
           Save

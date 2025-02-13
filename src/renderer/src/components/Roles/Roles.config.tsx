@@ -38,7 +38,8 @@ export const getRoleColumns = ({ onDelete }: TGetRoleColumns): TTableColumns<TRo
     },
     {
       key: 'action',
-      title: 'role',
+      dataIndex: 'role',
+      title: '',
       render: (role) => (
         <Button
           variant={'destructive'}
